@@ -19,6 +19,24 @@ app.config(function($routeProvider) {
     });
 });
 
+app.service("GroceryService", function(){
+    var groceryService = {};
+    groceryService.groceryItems = [
+        {id:1, completed: true, itemName: "milk", date: "2018-12-20" },
+        {id:2, completed: true, itemName: "cookies", date: "2018-12-20" },
+        {id:3, completed: true, itemName: "ice cream", date: "2018-12-10" },
+        {id:4, completed: true, itemName: "potatoes", date: "2018-12-11" },
+        {id:5, completed: true, itemName: "cereal", date: "2018-12-13" },
+        {id:6, completed: true, itemName: "bread", date: "2018-12-13" },
+        {id:7, completed: true, itemName: "eggs", date: "2018-12-13" },
+        {id:8, completed: true, itemName: "tortillas", date: "2018-12-15" }
+      ];
+      groceryService.save = function(entry){
+        groceryService.groceryItems.push(entry);
+      }
+      return groceryService;
+})
+
 app.controller("HomeController", [
   "$scope",
   function($scope) {
@@ -29,18 +47,15 @@ app.controller("HomeController", [
 app.controller("GroceryListItemsController", [
   "$scope",
   "$routeParams",
-  function($scope, $routeParams) {
-    $scope.groceryItems = [
-      { completed: true, itemName: "milk", date: "2018-12-20" },
-      { completed: true, itemName: "cookies", date: "2018-12-20" },
-      { completed: true, itemName: "ice cream", date: "2018-12-10" },
-      { completed: true, itemName: "potatoes", date: "2018-12-11" },
-      { completed: true, itemName: "cereal", date: "2018-12-13" },
-      { completed: true, itemName: "bread", date: "2018-12-13" },
-      { completed: true, itemName: "eggs", date: "2018-12-13" },
-      { completed: true, itemName: "tortillas", date: "2018-12-15" }
-    ];
-    $scope.rp = "Route Param Value: " + $routeParams.id + " Category: " + $routeParams.cat;
+  "$location",
+  "GroceryService",
+  function($scope, $routeParams, $location, GroceryService) {
+    $scope.groceryItems = GroceryService.groceryItems
+    $scope.groceryItem = { id: 7, completed:true, itemName: "burger", date: new Date()};
+    $scope.save = function(){
+        GroceryService.save($scope.groceryItem);
+        location.pathname("/");
+    }
   }
 ]);
 
