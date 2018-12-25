@@ -2,6 +2,7 @@
 <html>
   <head></head>
   <body>
+        
     <div class="col-xs-12">
       <a
         href="#!/addItem"
@@ -16,9 +17,14 @@
           class="list-group-item text-center clearfix"
         >
           <span style="font-weight: bold">{{ item.itemName | uppercase }}</span>
+          <a
+            href="#!/addItem/edit/{{ item.id }}"
+            class="btn btn-small btn-default pull-right"
+          >
+            <span class="glyphicon glyphicon-pencil"></span>
+          </a>
         </li>
       </ul>
     </div>
   </body>
 </html>
-
