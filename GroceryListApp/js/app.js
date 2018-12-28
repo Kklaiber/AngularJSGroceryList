@@ -24,49 +24,49 @@ app.service("GroceryService", function() {
   groceryService.groceryItems = [
     {
       id: 1,
-      completed: true,
+      completed: false,
       itemName: "milk",
       date: new Date("2018-12-20")
     },
     {
       id: 2,
-      completed: true,
+      completed: false,
       itemName: "cookies",
       date: new Date("2018-12-20")
     },
     {
       id: 3,
-      completed: true,
+      completed: false,
       itemName: "ice cream",
       date: new Date("2018-12-10")
     },
     {
       id: 4,
-      completed: true,
+      completed: false,
       itemName: "potatoes",
       date: new Date("2018-12-11")
     },
     {
       id: 5,
-      completed: true,
+      completed: false,
       itemName: "cereal",
       date: new Date("2018-12-13")
     },
     {
       id: 6,
-      completed: true,
+      completed: false,
       itemName: "bread",
       date: new Date("2018-12-13")
     },
     {
       id: 7,
-      completed: true,
+      completed:false,
       itemName: "eggs",
       date: new Date("2018-12-13")
     },
     {
       id: 8,
-      completed: true,
+      completed: false,
       itemName: "tortillas",
       date: new Date("2018-12-15")
     }
@@ -91,6 +91,9 @@ app.service("GroceryService", function() {
       return groceryService.newId;
     }
   };
+  groceryService.markCompleted = function(entry){
+      entry.completed = !entry.completed
+  }
   groceryService.removeItem = function(entry){
       var index = groceryService.groceryItems.indexOf(entry);
       groceryService.groceryItems.splice(index, 1)
@@ -119,7 +122,12 @@ app.controller("HomeController", [
 
     $scope.removeItem = function(entry){
         GroceryService.removeItem(entry);
+    };
+
+    $scope.markCompleted = function(entry){
+        GroceryService.markCompleted(entry);
     }
+
   }
 ]);
 
@@ -148,3 +156,10 @@ app.controller("GroceryListItemController", [
     // console.log($scope.groceryItems);
   }
 ]);
+
+app.directive("kkGroceryItem", function(){
+    return{
+        restrict: "E",
+        templateUrl: "views/groceryItem.html"
+    }
+})
