@@ -19,58 +19,21 @@ app.config(function($routeProvider) {
     });
 });
 
-app.service("GroceryService", function() {
+app.service("GroceryService", function($http) {
   var groceryService = {};
-  groceryService.groceryItems = [
-    {
-      id: 1,
-      completed: false,
-      itemName: "milk",
-      date: new Date("2018-12-20")
-    },
-    {
-      id: 2,
-      completed: false,
-      itemName: "cookies",
-      date: new Date("2018-12-20")
-    },
-    {
-      id: 3,
-      completed: false,
-      itemName: "ice cream",
-      date: new Date("2018-12-10")
-    },
-    {
-      id: 4,
-      completed: false,
-      itemName: "potatoes",
-      date: new Date("2018-12-11")
-    },
-    {
-      id: 5,
-      completed: false,
-      itemName: "cereal",
-      date: new Date("2018-12-13")
-    },
-    {
-      id: 6,
-      completed: false,
-      itemName: "bread",
-      date: new Date("2018-12-13")
-    },
-    {
-      id: 7,
-      completed:false,
-      itemName: "eggs",
-      date: new Date("2018-12-13")
-    },
-    {
-      id: 8,
-      completed: false,
-      itemName: "tortillas",
-      date: new Date("2018-12-15")
-    }
-  ];
+  groceryService.groceryItems = [];
+    $http({
+        method: "GET",
+        url: "data/serverData.json"
+    }).then(function successCallback(response){
+        groceryService.groceryItems = response.data;
+
+        for(var item in groceryService.groceryItems){
+            groceryService.groceryItems[item].date = new Date(
+                groceryService.groceryItems[item].date
+            );
+        }
+    })
 
   groceryService.findById = function(id) {
     for (var i in groceryService.groceryItems) {
@@ -91,13 +54,13 @@ app.service("GroceryService", function() {
       return groceryService.newId;
     }
   };
-  groceryService.markCompleted = function(entry){
-      entry.completed = !entry.completed
-  }
-  groceryService.removeItem = function(entry){
-      var index = groceryService.groceryItems.indexOf(entry);
-      groceryService.groceryItems.splice(index, 1)
-  }
+  groceryService.markCompleted = function(entry) {
+    entry.completed = !entry.completed;
+  };
+  groceryService.removeItem = function(entry) {
+    var index = groceryService.groceryItems.indexOf(entry);
+    groceryService.groceryItems.splice(index, 1);
+  };
   groceryService.save = function(entry) {
     var updatedItem = groceryService.findById(entry.id);
 
@@ -106,7 +69,21 @@ app.service("GroceryService", function() {
       updatedItem.itemName = entry.itemName;
       updatedItem.date = entry.date;
     } else {
-      entry.id = groceryService.getNewId();
+    $http({
+        method: "POST",
+        url: "data/addedItem.json",
+        params: entry,
+        headers: {
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json' 
+    }})
+    .then(function success(data, entry){
+        entry.id = response.data.newId
+    
+    });
+        //how we created the clientside id, but no longer needed since line
+        //74 does the same thing, but from the server.
+    //   entry.id = groceryService.getNewId();
       groceryService.groceryItems.push(entry);
     }
   };
@@ -117,17 +94,21 @@ app.controller("HomeController", [
   "$scope",
   "GroceryService",
   function($scope, GroceryService) {
-    $scope.appTitle = "Grocery List";
     $scope.groceryItems = GroceryService.groceryItems;
 
-    $scope.removeItem = function(entry){
-        GroceryService.removeItem(entry);
+    $scope.removeItem = function(entry) {
+      GroceryService.removeItem(entry);
     };
 
-    $scope.markCompleted = function(entry){
-        GroceryService.markCompleted(entry);
-    }
+    $scope.markCompleted = function(entry) {
+      GroceryService.markCompleted(entry);
+    };
 
+    $scope.$watch(function(){
+        return GroceryService.groceryItems;
+    }, function(groceryItems){
+        $scope.groceryItems = groceryItems;
+    })
   }
 ]);
 
@@ -157,9 +138,10 @@ app.controller("GroceryListItemController", [
   }
 ]);
 
-app.directive("kkGroceryItem", function(){
-    return{
-        restrict: "E",
-        templateUrl: "views/groceryItem.html"
-    }
-})
+app.directive("kkGroceryItem", function() {
+  return {
+    restrict: "E",
+    templateUrl: "views/groceryItem.html"
+  };
+});
+
